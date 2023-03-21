@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>4.19</version>
+        <relativePath />
+    </parent>
+    
+    <groupId>io.jenkins.plugins</groupId>
+    <artifactId>jenkinsDemo-Sample4</artifactId>
+    <version>1.0.27-SNAPSHOT</version>
+    <packaging>hpi</packaging>
+    <name>Caveonix Plugin Sample4</name>
+    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+    <!-- If you want this to appear on the plugin site page:
+    <developers>
+        <developer>
+            <id>bhacker</id>
+            <name>Bob Q. Hacker</name>
+            <email>bhacker@nowhere.net</email>
+        </developer>
+    </developers> -->
+    
+     <properties>
+        <jenkins.version>2.332.1</jenkins.version>	<!---->
+        <java.level>8</java.level>
+      <!--  <jenkins-test-harness.version>2.47</jenkins-test-harness.version>
+        <disabledTestInjection>true</disabledTestInjection>
+        <skipTests>false</skipTests> -->
+    </properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <!-- Pick up common dependencies for the selected LTS line: https://github.com/jenkinsci/bom#usage -->
+                <groupId>io.jenkins.tools.bom</groupId>
+                <artifactId>bom-2.332.x</artifactId>
+                <version>1451.v15f1fdb_772a_f</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>structs</artifactId>
+            <exclusions>
+        		<exclusion>
+            	<artifactId>tools</artifactId>
+            	<groupId>com.sun</groupId>
+       		 	</exclusion>
+    		</exclusions> 
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-cps</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-job</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-basic-steps</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-durable-task-step</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>repo.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>repo.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+    
+     <build>
+        <plugins>
+
+		<plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.7.0</version>
+            <configuration>
+                <!--<release>16</release>-->
+                <source>1.8</source>
+                <target>1.8</target>
+            </configuration>
+        </plugin>
+        
+       <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>animal-sniffer-maven-plugin</artifactId>
+    <version>1.16</version>
+    <configuration>
+		<skip>true</skip>
+     <ignoreDependencies>false</ignoreDependencies>
+        <signature>
+            <groupId>org.codehaus.mojo.signature</groupId>
+            <artifactId>java16</artifactId>
+            <version>1.0</version>
+        </signature>
+    </configuration>
+    <executions>
+        <execution>
+            <id>animal-sniffer</id>
+            <phase>test</phase>		<!---->
+            <goals>
+                <goal>check</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+      <!-- download external resources like jQuery, jQuery UI, datatable etc. via webjars -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>download-webresources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>jquery</artifactId>
+                  <version>1.12.3</version>
+                  <includes>**/jquery*.min.js</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>datatables</artifactId>
+                  <version>1.10.11</version>
+                  <includes>
+                    **/jquery.dataTables.min.js,**/dataTables.bootstrap.min.js,**/dataTables.bootstrap.min.css
+                  </includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>bootstrap</artifactId>
+                  <version>3.3.7-1</version>
+                  <includes>**/bootstrap.min.css,**/bootstrap.min.js,**/fonts/*</includes>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/webjars</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- copy downloaded resources to target/external-resources -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-downloaded-resources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/external-resources</outputDirectory>
+              <resources>
+                <resource>
+                  <targetPath>js</targetPath>
+                  <directory>${project.build.directory}/webjars/META-INF/resources/webjars/jquery/1.12.3</directory>
+                </resource>
+                <resource>
+                  <directory>${project.build.directory}/webjars/META-INF/resources/webjars/datatables/1.10.11</directory>
+                </resource>
+                <resource>
+                  <directory>${project.build.directory}/webjars/META-INF/resources/webjars/bootstrap/3.3.7-1</directory>
+                </resource>
+                <!-- also copy existing resources to use them in the HPL for testing -->
+                <resource>
+                  <directory>src/main/webapp</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- include downloaded resources in HPI -->
+      <plugin>
+        <groupId>org.jenkins-ci.tools</groupId>
+        <artifactId>maven-hpi-plugin</artifactId>
+        <configuration>
+          <minimumJavaVersion>1.8</minimumJavaVersion>
+          <webResources>
+            <webResource>
+              <directory>${project.build.directory}/external-resources</directory>
+              <filtering>false</filtering>
+            </webResource>
+          </webResources>
+          <!-- for testing -->
+          <warSourceDirectory>${project.build.directory}/external-resources</warSourceDirectory>
+        </configuration>
+      </plugin>
+    </plugins>    
+      </build>
+    
+</project>
